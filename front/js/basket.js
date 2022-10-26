@@ -71,6 +71,7 @@ function getTotalPrice() {
 
 /*******************************************************/
 /************** oriented object version ****************/
+/************* let basket = new Basket() ***************/
 /*******************************************************/
 class Basket{
     /* better performance: the object is created only once ("basket = new Basket()"), 

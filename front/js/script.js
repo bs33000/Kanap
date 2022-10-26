@@ -16,7 +16,7 @@ Data format
 
 /* const fetchAllProducts = async () => { */
 async function fetchAllProducts() {
-    /* fetch products from API
+    /* fetch all products from API
     */
     try {
         const url = `http://localhost:3000/api/products`;
@@ -26,7 +26,8 @@ async function fetchAllProducts() {
 
     } catch (err) {
         console.log(`Erreur : ` + err);
-        console.log(`Veuillez démarrer le serveur`);
+        console.log(`Veuillez consulter le fichier README`);
+        alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
         return null;
     }
 }
@@ -38,7 +39,7 @@ function displayProducts(product) {
     output: display products
     */
 
-    // create in DOM the required format for displaying the prodt card
+    // create in DOM the required format for displaying the product card
     const a = document.createElement("a");
     const article = document.createElement("article");
     const img = document.createElement("img");
@@ -69,8 +70,8 @@ function displayProducts(product) {
 
 
 async function renderPage() {
-    /* Get data from API and display each product
-    */
+/* Get data from API and display each product
+*/
 
     const data = await fetchAllProducts();
     data.forEach(function (product) {
@@ -79,4 +80,5 @@ async function renderPage() {
     });
 }
 
+/********************* Execute *************************/
 renderPage();
