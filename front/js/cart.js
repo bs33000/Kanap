@@ -2,21 +2,21 @@
 /************* let basket = new Basket() ***************/
 /*******************************************************/
 class Basket{
-  /* better performance: the object is created only once ("basket = new Basket()"), 
+  /* better performance: the object is created only once ("basket = new Basket()"),
   where the functions call the basket each time ("getBasket()") */
+  basket = [];
+
   constructor() {
     let basket = localStorage.getItem("basket");
-    if (basket == null) {
-      this.basket = [];
-    } else {
+    if (basket != null) {
       this.basket = JSON.parse(basket);
     }
   }
-  
+
   save() {
     localStorage.setItem("basket", JSON.stringify(this.basket));
   }
-  
+
   add(product) {
     let foundProduct = this.basket.find(p => p.id == product.id);
     if (foundProduct != undefined) {
@@ -27,7 +27,7 @@ class Basket{
     }
     this.save();
   }
-  
+
   clear() {
     localStorage.clear("basket");
   }
@@ -36,7 +36,7 @@ class Basket{
     this.basket = this.basket.filter (p => p.id != product.id);
     this.save();
   }
-  
+
   addWithQuantity(product, quantity) {
     let foundProduct = this.basket.find(p => p.id == product.id);
     if (foundProduct != undefined) {
@@ -47,7 +47,7 @@ class Basket{
     }
     this.save();
   }
-  
+
   changeQuantity (product, quantity) {
     let foundProduct = this.basket.find(p => p.id == product.id);
     if (foundProduct != undefined) {
@@ -59,7 +59,16 @@ class Basket{
       }
     }
   }
-  
+
+  getProductById(id) {
+    let foundProduct = this.basket.find(p => p.id == id);
+    if (foundProduct != undefined) {
+      return foundProduct;
+    } else {
+      alert("no corresponding product with this id")
+    }
+  }
+
   getNumberOfProducts() {
     let number = 0;
     for (let product of this.basket) {
@@ -67,7 +76,7 @@ class Basket{
     }
     return number;
   }
-  
+
   getTotalPrice() {
     let total = 0;
     for (let product of this.basket) {
@@ -84,7 +93,7 @@ async function fetchAllProducts() {
     const response = await fetch(url);
     const data = await response.json();
     return data;
-    
+
   } catch (err) {
     console.log(`Erreur : ` + err);
     console.log(`Veuillez consulter le fichier README`);
@@ -99,11 +108,11 @@ function getProductPrice (productId,data){
 }
 
 function getTotalCartPrice (basket, data){
-  /* for each cart item of basket, get corresponding price from database 
-  and compute quantity x price; 
+  /* for each cart item of basket, get corresponding price from database
+  and compute quantity x price;
   then sum all
   */
-  let total = 0; 
+  let total = 0;
   for (let product of basket) {
     total += product.quantity * getProductPrice (product.productId, data);
   }
@@ -141,54 +150,55 @@ async function displayCartItem (cartItem, product){
   let pDel = document.createElement("p");
   let inputQty = document.createElement("input");
 
+  // dynamic HTML structure
+  cartItems.appendChild(article);
+    article.appendChild(divImg);
+      divImg.appendChild(img);
+    article.appendChild(divContent);
+      divContent.appendChild(divContentInfo);
+        divContentInfo.appendChild(h2);
+        divContentInfo.appendChild(pPrice);
+        divContentInfo.appendChild(pColor);
+      divContent.appendChild(divSettings);
+        divSettings.appendChild(divSettingsQty);
+          divSettingsQty.appendChild(pQty);
+          divSettingsQty.appendChild(inputQty);
+        divSettings.appendChild(divSettingsDelete);
+          divSettingsDelete.appendChild(pDel);
+
+
+  //  Add classes dynamically
+    article.classList.add("cart__item");
+      divImg.classList.add("cart__item__img");
+      divContent.classList.add("cart__item__content");
+        divContentInfo.classList.add("cart__item__content__titlePrice");
+        divSettings.classList.add("cart__item__content__settings");
+        divSettingsQty.classList.add("cart__item__content__settings__quantity");
+        divSettingsDelete.classList.add("cart__item__content__settings__delete");
+          pDel.classList.add("deleteItem");
+          inputQty.classList.add("inputQty");
+
+  // Attributes
+  article.setAttribute(`data-id`, `${cartItem.id}`); //using data attribute 
+  inputQty.setAttribute("type", "number");
+  inputQty.setAttribute("name", "itemQuantity");
+  inputQty.setAttribute("min", "1");
+  inputQty.setAttribute("max", "100");
+  //inputQty.setAttribute("value", 0); // 0 with option to clik & add to current quantity
+  inputQty.setAttribute("value", `${cartItem.quantity}`); //display current quantity
+
   // Set values
   img.src = product.imageUrl;
   img.alt = product.altTxt;
   pPrice.innerText = product.price + " €";
   pColor.innerText = cartItem.productColor;
-  pQty.innerText = cartItem.quantity;
+  //pQty.innerText = cartItem.quantity;
   pDel.innerText = "Supprimer";
   h2.innerText = product.name;
-
-  // Organise page display
-  cartItems.appendChild(article);
-  article.appendChild(divImg);
-  divImg.appendChild(img);
-  article.appendChild(divContent);
-  divContent.appendChild(divContentInfo);
-  divContent.appendChild(divSettings);
-  divSettings.appendChild(divSettingsQty);
-  divSettingsQty.appendChild(pQty);
-  divSettingsQty.appendChild(inputQty);
-  divSettings.appendChild(divSettingsDelete);
-  divSettingsDelete.appendChild(pDel);
-  divContentInfo.appendChild(h2);
-  divContentInfo.appendChild(pPrice);
-  divContentInfo.appendChild(pColor);
-
-  //  Add classes dynamically
-  article.classList.add("cart__item");
-  divImg.classList.add("cart__item__img");
-  divContent.classList.add("cart__item__content");
-  divContentInfo.classList.add("cart__item__content__titlePrice");
-  divSettings.classList.add("cart__item__content__settings");
-  divSettingsQty.classList.add("cart__item__content__settings__quantity");
-  divSettingsDelete.classList.add("cart__item__content__settings__delete");
-  pDel.classList.add("deleteItem");
-  inputQty.classList.add("inputQty");
-
-  // Attributes
-  article.setAttribute(`data-id`, `${cartItem.productId}`);
-  inputQty.setAttribute("type", "number");
-  inputQty.setAttribute("name", "itemQuantity");
-  inputQty.setAttribute("min", "1");
-  inputQty.setAttribute("max", "100");
-  inputQty.setAttribute("value", 0); // 0 with option to clik & add to current quantity 
-  //inputQty.setAttribute("value", `${cartItem.quantity}`); //display current quantity
-}
+  }
 
 async function fetchPostOrder(contact, products) {
-  /* POST contact info and cart content to backe-end 
+  /* POST contact info and cart content to backe-end
   "http://localhost:3000/api/products/order"
   Get order ID as a reply from backend
   */
@@ -274,18 +284,15 @@ create contact and product_array as specified, and POST to API
         inputAddressOk == true &
         inputCityOk == true &
         inputEmailOk == true) {
-      e.preventDefault();
-      let cartItemArray = [];
-      for (let item of basket.basket){
-        cartItemArray.push(item.productId)
-      };
-      console.log(cartItemArray);
-      console.log(contact);
-      fetchPostOrder(contact, cartItemArray);
-      //alert("Commande enregistrée - Merci");
-      window.location.href="confirmation.html#limitedWidthBlock";
-      //basket.clear();
-
+          e.preventDefault();
+          let cartItemArray = [];
+          for (let item of basket.basket){
+            cartItemArray.push(item.productId)
+          };
+        console.log(cartItemArray);
+        console.log(contact);
+        fetchPostOrder(contact, cartItemArray);
+        window.location.href="confirmation.html#limitedWidthBlock";
     } else {
       alert("Certains éléments du formulaire contact sont incorrectement remplis, veuillez réessayer svp");
     }
@@ -296,78 +303,61 @@ async function renderCartPage() {
   /* display cart content
   combine cart content and product API
   */
-
+  const data = await fetchAllProducts();
   let basket = new Basket();
-  //alert(JSON.stringify(basket));
-  //console.log(basket == []);
-  //console.log(basket);
 
-  // Check for empty local storage
-  if (basket === [] ) {
+  // Check for empty basket
+  if (basket.basket.length === 0 ) {
     const emptyCart = document.querySelector("h1");
-    emptyCart.innerHTML = emptyCart.innerText + " est vide, veuillez aller sur la page d'accueil";
+    emptyCart.innerHTML = emptyCart.innerText + " est vide";
 
   // display products listed in basket as saved in local storage
   } else {
-    const data = await fetchAllProducts();
-
+    // display each product in the basket - getting full product info for a given item
     for (let cartItem of basket.basket) {
       let product = data.find(p => p._id === cartItem.productId);
       displayCartItem(cartItem, product);
-
-      // Delete an item from cart by click
-      // using event delegation since pDel has been created dynamicaly in the DOM
-      // https://stackoverflow.com/questions/34896106/attach-event-to-dynamic-elements-in-javascript
-      document.addEventListener('click', function(e){
-        //if(e.target && e.target.classlist == 'pDel'){
-            console.log('e ' + e);
-            console.log('e.target ' + e.target);
-            console.log('e.target.id ' + e.target.id);
-            console.log('e.target.classlist ' + e.target.classList);
-
-            //basket.remove(product);
-            //alert("Produit supprimé du panier");
-            //document.reload(true);
-        //}
-      });
-
-      document.addEventListener('click', function(){
-        document.querySelectorAll('.pDel').forEach(function(el){
-          el.addEventListener('click',function(){
-            alert('Hello')
-          })
-        })
-      });
-
-
-
-
-/*
-      let item = document.getElementsByClassName("pDel");
-      for (let i = 0; i < item.length; i++) {
-        item[i].addEventListener("click", console.log('i= ' + i ));
-   
-      }
-      */
-
-
-
-/*
-      // Amend cart item quantity => add inputed value to existing quantity
-      inputQty.addEventListener ("input", function()  {
-        basket.changeQuantity(product, Number(this.value));
-        pQty.innerText = Number(this.value);
-        pPrice.innerText = product.price * Number(this.value) + " €";
-        alert("Quantité modifiée dans le panier");
-      });*/
     };
 
+    // Manage item deletion: add an evenListener for each item
+    // and remove it from the DOM and the basket
+    let item = document.getElementsByClassName("deleteItem");
+    for (let i = 0; i < item.length; i++) {
+      item[i].addEventListener("click", function(e){
+        let article = e.target.closest("article"); // go up to the parent article
+        let cartItem = basket.getProductById(article.dataset.id);
+        basket.remove(cartItem); // remove from basket
+        article.remove(); // remove from DOM
+        if (basket.basket.length === 0 ) {document.location.reload(true)}
+        displayTotalInvoice(basket.getNumberOfProducts(),
+          getTotalCartPrice (basket.basket, data));
+      });
+    }
+
+    // Manage adding quantity to existing cart item: add an evenListener for each item
+    // display new basket quantity, amend basket 
+    let item2 = document.getElementsByClassName("inputQty");
+    for (let i = 0; i < item2.length; i++) {
+      item2[i].addEventListener("input", function(e){
+        let article = e.target.closest("article"); // go up to the parent article
+        let cartItem = basket.getProductById(article.dataset.id);
+        basket.changeQuantity(cartItem, Number(e.target.value) - cartItem.quantity);
+        displayTotalInvoice(basket.getNumberOfProducts(),
+          getTotalCartPrice (basket.basket, data));
+      });
+    }
+
     // compute and display cart number of articles and total price
-    let totalInvoice = getTotalCartPrice (basket.basket, data);
-    displayTotalInvoice(basket.getNumberOfProducts(),totalInvoice);
+    displayTotalInvoice(basket.getNumberOfProducts(),
+      getTotalCartPrice (basket.basket, data));
   }
 
-  if (basket !=[], orderManagement(basket));
+  // complete the order unless basket is empty
+  if (basket.basket.length == 0) {
+    alert("votre panier est vide");
+  } else {
+    orderManagement(basket);
+  }
 }
 
 
