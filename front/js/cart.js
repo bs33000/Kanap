@@ -1,4 +1,3 @@
-//import { Basket } from "./Basket.js";
 /*******************************************************/
 /************** oriented object Basket ****************/
 /************* let basket = new Basket() ***************/
@@ -97,7 +96,7 @@ async function fetchAllProducts() {
     return data;
 
   } catch (err) {
-      alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
+    alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
     return null;
   }
 }
@@ -152,19 +151,19 @@ async function displayCartItem (cartItem, product){
 
   // dynamic HTML structure
   cartItems.appendChild(article);
-    article.appendChild(divImg);
-      divImg.appendChild(img);
-    article.appendChild(divContent);
-      divContent.appendChild(divContentInfo);
-        divContentInfo.appendChild(h2);
-        divContentInfo.appendChild(pPrice);
-        divContentInfo.appendChild(pColor);
-      divContent.appendChild(divSettings);
-        divSettings.appendChild(divSettingsQty);
-          divSettingsQty.appendChild(pQty);
-          divSettingsQty.appendChild(inputQty);
-        divSettings.appendChild(divSettingsDelete);
-          divSettingsDelete.appendChild(pDel);
+  article.appendChild(divImg);
+  divImg.appendChild(img);
+  article.appendChild(divContent);
+  divContent.appendChild(divContentInfo);
+  divContentInfo.appendChild(h2);
+  divContentInfo.appendChild(pPrice);
+  divContentInfo.appendChild(pColor);
+  divContent.appendChild(divSettings);
+  divSettings.appendChild(divSettingsQty);
+  divSettingsQty.appendChild(pQty);
+  divSettingsQty.appendChild(inputQty);
+  divSettings.appendChild(divSettingsDelete);
+  divSettingsDelete.appendChild(pDel);
 
 
   //  Add classes dynamically
@@ -181,11 +180,11 @@ async function displayCartItem (cartItem, product){
   // Attributes
   inputQty.setAttribute("type", "number");
   inputQty.setAttribute("name", "itemQuantity");
-  inputQty.setAttribute("min", "1"); //force minimum as 1 => custy has to use delete btn 
+  inputQty.setAttribute("min", "1"); //force minimum as 1 => custy has to use delete btn
   inputQty.setAttribute("max", "100");
   inputQty.setAttribute("value", `${cartItem.quantity}`); //display current quantity
   //set a data attribute for each article => can be idendified specifically when EventListened
-  article.setAttribute(`data-id`, `${cartItem.id}`); 
+  article.setAttribute(`data-id`, `${cartItem.id}`);
 
   // Set values
   img.src = product.imageUrl;
@@ -194,7 +193,7 @@ async function displayCartItem (cartItem, product){
   pColor.innerText = cartItem.productColor;
   pDel.innerText = "Supprimer";
   h2.innerText = product.name;
-  }
+}
 
 async function fetchPostOrder(contact, products) {
   /* POST contact info and cart content to backe-end
@@ -203,30 +202,28 @@ async function fetchPostOrder(contact, products) {
   */
 
   fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json", //define expected content type
-    },
-    body: JSON.stringify({ contact, products }),
-  })
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json", //define expected content type
+  },
+  body: JSON.stringify({ contact, products }),
+})
 
-    .then((response) => response.json())
-    .then((data) => {
-      // without using local storage
-      window.location.href = `confirmation.html?id=${data.orderId}`;
-    })
-    .catch((err) => {
-      alert("Erreur : " + err);
-    });
-  return null;
+.then((response) => response.json())
+.then((data) => {
+  // without using local storage
+  window.location.href = `confirmation.html?id=${data.orderId}`;
+})
+.catch((err) => {
+  alert("Erreur : " + err);
+});
+return null;
 }
 
-
-function orderManagement(basket) {
-/* Wait for custy to input contact info
-check input format
-create contact and product_array as required by API, and POST to API
-*/
+function inputContactOk () {
+  /* verify that each required field is correctly inputed
+  return True is everything is ok + the object contact
+  */
 
   // accepted format for contact info
   const regexName = /^(?=.{1,50}$)[a-z\u00C0-\u00FF]+(?:['-_.\s][a-z\u00C0-\u00FF]+)*$/i;
@@ -238,73 +235,92 @@ create contact and product_array as required by API, and POST to API
   let inputCityOk = false;
   let inputEmailOk = false;
 
+  // create contact details required format
+  let contact = {
+    firstName: document.getElementById("firstName").value,
+    lastName: document.getElementById("lastName").value,
+    address: document.getElementById("address").value,
+    city: document.getElementById("city").value,
+    email: document.getElementById("email").value,
+  };
+
+  // verify each required input format
+  if (!regexName.test(contact.firstName)) {
+    inputFisrtNameOk = false;
+    document.getElementById('firstNameErrorMsg').innerText =
+    "Merci de vérifier le format de saisie du prénom";
+  } else {inputFisrtNameOk = true}
+
+  if (!regexName.test(contact.lastName)) {
+    inputLastNameOk = false;
+    document.getElementById('lastNameErrorMsg').innerText =
+    "Merci de vérifier le format de saisie du nom";
+  } else {inputLastNameOk = true}
+
+  if (!regexLocation.test(contact.address)) {
+    inputAddressOk = false;
+    document.getElementById('addressErrorMsg').innerText =
+    "Merci de vérifier le format de saisie de l'adresse";
+  } else {inputAddressOk = true}
+
+  if (!regexLocation.test(contact.city)) {
+    inputCityOk = false;
+    document.getElementById('cityErrorMsg').innerText =
+    "Merci de vérifier le format de saisie de la ville";
+  } else {inputCityOk = true}
+
+  if (!regexEmail.test(contact.email)) {
+    inputEmailOk = false;
+    document.getElementById('emailErrorMsg').innerText =
+    "Merci de vérifier le format de saisie de l'email";
+  } else {inputEmailOk = true}
+
+  let inputIsOk = (inputFisrtNameOk == true && inputLastNameOk == true &&
+    inputAddressOk == true &&  inputCityOk == true && inputEmailOk == true);
+
+  return [inputIsOk, contact];
+}
+
+
+function orderManagement(basket) {
+  /* Wait for custy to input contact info
+  check input format
+  create contact and product_array as required by API, and POST to API
+  */
+
   const orderBtn = document.getElementById("order");
   orderBtn.addEventListener("click", (e) => {
-    // verify each required input format
-    if (!regexName.test(document.getElementById("firstName").value)) {
-      inputFisrtNameOk = false;
-      document.getElementById('firstNameErrorMsg').innerText =
-      "Merci de vérifier le format de saisie du prénom";
-    } else {inputFisrtNameOk = true}
-
-    if (!regexName.test(document.getElementById("lastName").value)) {
-      inputLastNameOk = false;
-      document.getElementById('lastNameErrorMsg').innerText =
-      "Merci de vérifier le format de saisie du nom";
-    } else {inputLastNameOk = true}
-
-    if (!regexLocation.test(document.getElementById("address").value)) {
-      inputAddressOk = false;
-      document.getElementById('addressErrorMsg').innerText =
-      "Merci de vérifier le format de saisie de l'adresse";
-    } else {inputAddressOk = true}
-
-    if (!regexLocation.test(document.getElementById("city").value)) {
-      inputCityOk = false;
-      document.getElementById('cityErrorMsg').innerText =
-      "Merci de vérifier le format de saisie de la ville";
-    } else {inputCityOk = true}
-
-    if (!regexEmail.test(document.getElementById("email").value)) {
-      inputEmailOk = false;
-      document.getElementById('emailErrorMsg').innerText =
-      "Merci de vérifier le format de saisie de l'email";
-    } else {inputEmailOk = true}
+    let res = inputContactOk();
+    let inputIsOk = res[0];
+    let contact = res[1];
 
     // if all input are correct, generate order data and post to API
-    if (inputFisrtNameOk == true && inputLastNameOk == true && inputAddressOk == true &&
-        inputCityOk == true && inputEmailOk == true) {
-        e.preventDefault();
+    if (inputIsOk) {
+      e.preventDefault();
 
-        // create API required product id list 
-        let cartItemArray = [];
-        for (let item of basket.basket){
-          cartItemArray.push(item.productId)
-        };
-
-        // create API required contact details 
-        let contact = {
-          firstName: document.getElementById("firstName").value,
-          lastName: document.getElementById("lastName").value,
-          address: document.getElementById("address").value,
-          city: document.getElementById("city").value,
-          email: document.getElementById("email").value,
-        };
-
-        fetchPostOrder(contact, cartItemArray);
-        window.location.href="confirmation.html#limitedWidthBlock";
+      // create API required product id list
+      let cartItemArray = [];
+      for (let item of basket.basket){
+        cartItemArray.push(item.productId)
+      };
+      // Post order with required contact and productId array
+      fetchPostOrder(contact, cartItemArray);
+      window.location.href="confirmation.html#limitedWidthBlock";
+      basket.clear();
 
     } else {
-      alert("Certains éléments du formulaire contact sont incorrectement remplis, veuillez réessayer svp");
+        alert("Certains éléments du formulaire contact sont incorrectement remplis, veuillez réessayer svp");
     }
   });
 }
 
+
+
 async function renderCartPage() {
   /* display cart content using product API info
-    - manage deletion and cartItem change of quantity
-    -uptdate total of articles & price
-    - if cart is not empty => function orderManagement
+  - manage deletion and cartItem change of quantity
+  -uptdate total of articles & price
+  - if cart is not empty => function orderManagement
   */
 
   const data = await fetchAllProducts();
@@ -315,69 +331,66 @@ async function renderCartPage() {
     const emptyCart = document.querySelector("h1");
     emptyCart.innerHTML = emptyCart.innerText + " \nest vide";
     // hide unecessary order contact infos
-    document.getElementsByClassName("cart__order")[0]
-    .setAttribute("style", "display:none");
+    document.getElementsByClassName("cart__order")[0].setAttribute("style", "display:none");
 
-    // back to index
+    // display clickable link to go back to index
     const pToHome = document.createElement("p");
     emptyCart.appendChild(pToHome);
     pToHome.style.color = "blue";
     pToHome.style.fontSize = "large";
     pToHome.style.cursor = "pointer";
     pToHome.innerHTML = "=> Retour Accueil <=";
-    pToHome.addEventListener ("click", function(e){
-      window.location.href="index.html"
-    });
+    pToHome.addEventListener ("click", function(e){window.location.href="index.html"});
 
-  // if not empty, display products listed in basket as saved in local storage
-  } else {
-    // display each product in the basket - getting full product info for a given item
-    for (let cartItem of basket.basket) {
-      let product = data.find(p => p._id === cartItem.productId);
-      displayCartItem(cartItem, product);
-    };
+    // if not empty, display products listed in basket as saved in local storage
+    } else {
+      // display each product in the basket - getting full product info for a given item
+      for (let cartItem of basket.basket) {
+        let product = data.find(p => p._id === cartItem.productId);
+        displayCartItem(cartItem, product);
+      };
 
-    // Manage item deletion: add an evenListener for each item
-    // and remove it from the DOM and the basket
-    let item = document.getElementsByClassName("deleteItem");
-    for (let i = 0; i < item.length; i++) {
-      item[i].addEventListener("click", function(e){
-        let article = e.target.closest("article"); // go up to the parent article
-        let cartItem = basket.getProductById(article.dataset.id); //corresponding item
-        basket.remove(cartItem); // remove item from basket
-        article.remove(); // remove item from DOM
-        if (basket.basket.length === 0 ) {document.location.reload(true)}
-        displayTotalInvoice(basket.getNumberOfProducts(),
+      // Manage item deletion: add an evenListener for each item
+      // and remove it from the DOM and the basket
+      let item = document.getElementsByClassName("deleteItem");
+      for (let i = 0; i < item.length; i++) {
+        item[i].addEventListener("click", function(e){
+          let article = e.target.closest("article"); // go up to the parent article
+          let cartItem = basket.getProductById(article.dataset.id); //corresponding item
+          basket.remove(cartItem); // remove item from basket
+          article.remove(); // remove item from DOM
+          if (basket.basket.length === 0 ) {document.location.reload(true)}
+          displayTotalInvoice(basket.getNumberOfProducts(),
           getTotalCartPrice (basket.basket, data));
-      });
-    }
+        });
+      }
 
-    // Manage adding quantity to existing cart item: add an evenListener for each item
-    // display new basket quantity, amend basket
-    let item2 = document.getElementsByClassName("inputQty");
-    for (let i = 0; i < item2.length; i++) {
-      item2[i].addEventListener("input", function(e){
-        let article = e.target.closest("article"); // go up to the parent article
-        let cartItem = basket.getProductById(article.dataset.id); //corresponding item
-        basket.changeQuantity(cartItem, Number(e.target.value) - cartItem.quantity); //adjust qty by delta between intial and new qty
-        displayTotalInvoice(basket.getNumberOfProducts(),
+      // Manage adding quantity to existing cart item: add an evenListener for each item
+      // display new basket quantity, amend basket
+      let item2 = document.getElementsByClassName("inputQty");
+      for (let i = 0; i < item2.length; i++) {
+        item2[i].addEventListener("input", function(e){
+          let article = e.target.closest("article"); // go up to the parent article
+          let cartItem = basket.getProductById(article.dataset.id); //corresponding item
+          basket.changeQuantity(cartItem, Number(e.target.value) - cartItem.quantity); //adjust qty by delta between intial and new qty
+          displayTotalInvoice(basket.getNumberOfProducts(),
           getTotalCartPrice (basket.basket, data));
-      });
-    }
+        });
+      }
 
-    // compute and display cart's number of articles and total price
-    displayTotalInvoice(basket.getNumberOfProducts(),
+      // compute and display cart's number of articles and total price
+      displayTotalInvoice(basket.getNumberOfProducts(),
       getTotalCartPrice (basket.basket, data));
+
+      // complete the order unless basket is empty
+      if (basket.basket.length !== 0) {
+        orderManagement(basket);
+      }
+    }
   }
 
-  // complete the order unless basket is empty
-  if (basket.basket.length == 0) {
-  } else {
-    orderManagement(basket);
-  }
-}
 
 
+  /********************* Execute *************************/
 
-/********************* Execute *************************/
-renderCartPage();
+  renderCartPage();
