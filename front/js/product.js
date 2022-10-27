@@ -84,7 +84,6 @@ async function fetchProductById(urlId) {
         const data = await response.json();
         return data;
     } catch (err) {
-        console.log(`Erreur : ` + err);
         alert (`Erreur       : ${err}`);
         return null;
     }
@@ -174,6 +173,7 @@ async function renderProductPage() {
     addBtn.addEventListener("click", (event) => {
         event.preventDefault();
         AddProductToCart(data);
+        window.location.href="index.html";
     });
 }
 

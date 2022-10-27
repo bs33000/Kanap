@@ -16,7 +16,7 @@ Data format
 
 /* const fetchAllProducts = async () => { */
 async function fetchAllProducts() {
-    /* fetch all products from API
+    /* fetch all products from API - verb is GET
     */
     try {
         const url = `http://localhost:3000/api/products`;
@@ -25,8 +25,6 @@ async function fetchAllProducts() {
         return data;
 
     } catch (err) {
-        console.log(`Erreur : ` + err);
-        console.log(`Veuillez consulter le fichier README`);
         alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
         return null;
     }
@@ -53,30 +51,29 @@ function displayProducts(product) {
     h3.classList.add("productName");
     p.classList.add("productDescription");
 
+    // Append DOM strucutre with the newly created DOM elements
+    document.getElementById("items").appendChild(a);
+    a.appendChild(article);
+        article.appendChild(img);
+        article.appendChild(h3);
+        article.appendChild(p);
+
     // assign product API info to the newly created DOM elements
     a.href = urlProduct + product._id;
     img.src = product.imageUrl;
     img.alt = product.altTxt;
     h3.textContent = product.name;
     p.textContent = product.description;
-
-    // Append DOM strucutre with the newly created DOM elements
-    document.getElementById("items").appendChild(a);
-    a.appendChild(article);
-    article.appendChild(img);
-    article.appendChild(h3);
-    article.appendChild(p);
 }
 
 
 async function renderPage() {
-/* Get data from API and display each product
-*/
+    /* Get data from API and display each product
+    */
 
     const data = await fetchAllProducts();
     data.forEach(function (product) {
         displayProducts(product);
-        console.log(product);
     });
 }
 

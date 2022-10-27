@@ -1,9 +1,10 @@
-/************** oriented object version ****************/
+//import { Basket } from "./Basket.js";
+/*******************************************************/
+/************** oriented object Basket ****************/
 /************* let basket = new Basket() ***************/
 /*******************************************************/
 class Basket{
-  /* better performance: the object is created only once ("basket = new Basket()"),
-  where the functions call the basket each time ("getBasket()") */
+
   basket = [];
 
   constructor() {
@@ -86,6 +87,7 @@ class Basket{
   }
 }
 
+
 async function fetchAllProducts() {
   /* fetch all products from API */
   try {
@@ -95,9 +97,7 @@ async function fetchAllProducts() {
     return data;
 
   } catch (err) {
-    console.log(`Erreur : ` + err);
-    console.log(`Veuillez consulter le fichier README`);
-    alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
+      alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
     return null;
   }
 }
@@ -168,31 +168,30 @@ async function displayCartItem (cartItem, product){
 
 
   //  Add classes dynamically
-    article.classList.add("cart__item");
-      divImg.classList.add("cart__item__img");
-      divContent.classList.add("cart__item__content");
-        divContentInfo.classList.add("cart__item__content__titlePrice");
-        divSettings.classList.add("cart__item__content__settings");
-        divSettingsQty.classList.add("cart__item__content__settings__quantity");
-        divSettingsDelete.classList.add("cart__item__content__settings__delete");
-          pDel.classList.add("deleteItem");
-          inputQty.classList.add("inputQty");
+  article.classList.add("cart__item");
+  divImg.classList.add("cart__item__img");
+  divContent.classList.add("cart__item__content");
+  divContentInfo.classList.add("cart__item__content__titlePrice");
+  divSettings.classList.add("cart__item__content__settings");
+  divSettingsQty.classList.add("cart__item__content__settings__quantity");
+  divSettingsDelete.classList.add("cart__item__content__settings__delete");
+  pDel.classList.add("deleteItem");
+  inputQty.classList.add("inputQty");
 
   // Attributes
-  article.setAttribute(`data-id`, `${cartItem.id}`); //using data attribute 
   inputQty.setAttribute("type", "number");
   inputQty.setAttribute("name", "itemQuantity");
-  inputQty.setAttribute("min", "1");
+  inputQty.setAttribute("min", "1"); //force minimum as 1 => custy has to use delete btn 
   inputQty.setAttribute("max", "100");
-  //inputQty.setAttribute("value", 0); // 0 with option to clik & add to current quantity
   inputQty.setAttribute("value", `${cartItem.quantity}`); //display current quantity
+  //set a data attribute for each article => can be idendified specifically when EventListened
+  article.setAttribute(`data-id`, `${cartItem.id}`); 
 
   // Set values
   img.src = product.imageUrl;
   img.alt = product.altTxt;
   pPrice.innerText = product.price + " €";
   pColor.innerText = cartItem.productColor;
-  //pQty.innerText = cartItem.quantity;
   pDel.innerText = "Supprimer";
   h2.innerText = product.name;
   }
@@ -213,11 +212,11 @@ async function fetchPostOrder(contact, products) {
 
     .then((response) => response.json())
     .then((data) => {
-      localStorage.setItem("order", JSON.stringify(data));
+      // without using local storage
+      window.location.href = `confirmation.html?id=${data.orderId}`;
     })
     .catch((err) => {
       alert("Erreur : " + err);
-      console.log(`Erreur : ` + err);
     });
   return null;
 }
@@ -226,7 +225,7 @@ async function fetchPostOrder(contact, products) {
 function orderManagement(basket) {
 /* Wait for custy to input contact info
 check input format
-create contact and product_array as specified, and POST to API
+create contact and product_array as required by API, and POST to API
 */
 
   // accepted format for contact info
@@ -241,58 +240,60 @@ create contact and product_array as specified, and POST to API
 
   const orderBtn = document.getElementById("order");
   orderBtn.addEventListener("click", (e) => {
-    let contact = {
-      firstName: document.getElementById("firstName").value,
-      lastName: document.getElementById("lastName").value,
-      address: document.getElementById("address").value,
-      city: document.getElementById("city").value,
-      email: document.getElementById("email").value,
-    };
-
-    if (!regexName.test(contact.firstName)) {
+    // verify each required input format
+    if (!regexName.test(document.getElementById("firstName").value)) {
       inputFisrtNameOk = false;
       document.getElementById('firstNameErrorMsg').innerText =
       "Merci de vérifier le format de saisie du prénom";
     } else {inputFisrtNameOk = true}
 
-    if (!regexName.test(contact.lastName)) {
+    if (!regexName.test(document.getElementById("lastName").value)) {
       inputLastNameOk = false;
       document.getElementById('lastNameErrorMsg').innerText =
       "Merci de vérifier le format de saisie du nom";
     } else {inputLastNameOk = true}
 
-    if (!regexLocation.test(contact.address)) {
+    if (!regexLocation.test(document.getElementById("address").value)) {
       inputAddressOk = false;
       document.getElementById('addressErrorMsg').innerText =
       "Merci de vérifier le format de saisie de l'adresse";
     } else {inputAddressOk = true}
 
-    if (!regexLocation.test(contact.city)) {
+    if (!regexLocation.test(document.getElementById("city").value)) {
       inputCityOk = false;
       document.getElementById('cityErrorMsg').innerText =
       "Merci de vérifier le format de saisie de la ville";
     } else {inputCityOk = true}
 
-    if (!regexEmail.test(contact.email)) {
+    if (!regexEmail.test(document.getElementById("email").value)) {
       inputEmailOk = false;
       document.getElementById('emailErrorMsg').innerText =
       "Merci de vérifier le format de saisie de l'email";
     } else {inputEmailOk = true}
 
-    if (inputFisrtNameOk == true &
-        inputLastNameOk == true &
-        inputAddressOk == true &
-        inputCityOk == true &
-        inputEmailOk == true) {
-          e.preventDefault();
-          let cartItemArray = [];
-          for (let item of basket.basket){
-            cartItemArray.push(item.productId)
-          };
-        console.log(cartItemArray);
-        console.log(contact);
+    // if all input are correct, generate order data and post to API
+    if (inputFisrtNameOk == true && inputLastNameOk == true && inputAddressOk == true &&
+        inputCityOk == true && inputEmailOk == true) {
+        e.preventDefault();
+
+        // create API required product id list 
+        let cartItemArray = [];
+        for (let item of basket.basket){
+          cartItemArray.push(item.productId)
+        };
+
+        // create API required contact details 
+        let contact = {
+          firstName: document.getElementById("firstName").value,
+          lastName: document.getElementById("lastName").value,
+          address: document.getElementById("address").value,
+          city: document.getElementById("city").value,
+          email: document.getElementById("email").value,
+        };
+
         fetchPostOrder(contact, cartItemArray);
         window.location.href="confirmation.html#limitedWidthBlock";
+
     } else {
       alert("Certains éléments du formulaire contact sont incorrectement remplis, veuillez réessayer svp");
     }
@@ -300,18 +301,35 @@ create contact and product_array as specified, and POST to API
 }
 
 async function renderCartPage() {
-  /* display cart content
-  combine cart content and product API
+  /* display cart content using product API info
+    - manage deletion and cartItem change of quantity
+    -uptdate total of articles & price
+    - if cart is not empty => function orderManagement
   */
+
   const data = await fetchAllProducts();
   let basket = new Basket();
 
   // Check for empty basket
   if (basket.basket.length === 0 ) {
     const emptyCart = document.querySelector("h1");
-    emptyCart.innerHTML = emptyCart.innerText + " est vide";
+    emptyCart.innerHTML = emptyCart.innerText + " \nest vide";
+    // hide unecessary order contact infos
+    document.getElementsByClassName("cart__order")[0]
+    .setAttribute("style", "display:none");
 
-  // display products listed in basket as saved in local storage
+    // back to index
+    const pToHome = document.createElement("p");
+    emptyCart.appendChild(pToHome);
+    pToHome.style.color = "blue";
+    pToHome.style.fontSize = "large";
+    pToHome.style.cursor = "pointer";
+    pToHome.innerHTML = "=> Retour Accueil <=";
+    pToHome.addEventListener ("click", function(e){
+      window.location.href="index.html"
+    });
+
+  // if not empty, display products listed in basket as saved in local storage
   } else {
     // display each product in the basket - getting full product info for a given item
     for (let cartItem of basket.basket) {
@@ -325,9 +343,9 @@ async function renderCartPage() {
     for (let i = 0; i < item.length; i++) {
       item[i].addEventListener("click", function(e){
         let article = e.target.closest("article"); // go up to the parent article
-        let cartItem = basket.getProductById(article.dataset.id);
-        basket.remove(cartItem); // remove from basket
-        article.remove(); // remove from DOM
+        let cartItem = basket.getProductById(article.dataset.id); //corresponding item
+        basket.remove(cartItem); // remove item from basket
+        article.remove(); // remove item from DOM
         if (basket.basket.length === 0 ) {document.location.reload(true)}
         displayTotalInvoice(basket.getNumberOfProducts(),
           getTotalCartPrice (basket.basket, data));
@@ -335,26 +353,25 @@ async function renderCartPage() {
     }
 
     // Manage adding quantity to existing cart item: add an evenListener for each item
-    // display new basket quantity, amend basket 
+    // display new basket quantity, amend basket
     let item2 = document.getElementsByClassName("inputQty");
     for (let i = 0; i < item2.length; i++) {
       item2[i].addEventListener("input", function(e){
         let article = e.target.closest("article"); // go up to the parent article
-        let cartItem = basket.getProductById(article.dataset.id);
-        basket.changeQuantity(cartItem, Number(e.target.value) - cartItem.quantity);
+        let cartItem = basket.getProductById(article.dataset.id); //corresponding item
+        basket.changeQuantity(cartItem, Number(e.target.value) - cartItem.quantity); //adjust qty by delta between intial and new qty
         displayTotalInvoice(basket.getNumberOfProducts(),
           getTotalCartPrice (basket.basket, data));
       });
     }
 
-    // compute and display cart number of articles and total price
+    // compute and display cart's number of articles and total price
     displayTotalInvoice(basket.getNumberOfProducts(),
       getTotalCartPrice (basket.basket, data));
   }
 
   // complete the order unless basket is empty
   if (basket.basket.length == 0) {
-    alert("votre panier est vide");
   } else {
     orderManagement(basket);
   }
