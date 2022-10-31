@@ -212,8 +212,7 @@ async function fetchPostOrder(contact, products) {
 .then((response) => response.json())
 .then((data) => {
   // without using local storage
-      document.location.href = `confirmation.html?id=${data.orderId}`;
-      //window.location.href="confirmation.html#limitedWidthBlock";
+      document.location.href = `confirmation.html?id=${data.orderId}#limitedWidthBlock`;
 })
 .catch((err) => {
   alert("Erreur : " + err);
