@@ -212,7 +212,8 @@ async function fetchPostOrder(contact, products) {
 .then((response) => response.json())
 .then((data) => {
   // without using local storage
-  window.location.href = `confirmation.html?id=${data.orderId}`;
+      document.location.href = `confirmation.html?id=${data.orderId}`;
+      //window.location.href="confirmation.html#limitedWidthBlock";
 })
 .catch((err) => {
   alert("Erreur : " + err);
@@ -282,14 +283,14 @@ function inputContactOk () {
 }
 
 
-function orderManagement(basket) {
+async function orderManagement(basket) {
   /* Wait for custy to input contact info
   check input format
   create contact and product_array as required by API, and POST to API
   */
 
   const orderBtn = document.getElementById("order");
-  orderBtn.addEventListener("click", (e) => {
+  orderBtn.addEventListener("click", async (e) => {
     let res = inputContactOk();
     let inputIsOk = res[0];
     let contact = res[1];
@@ -304,9 +305,8 @@ function orderManagement(basket) {
         cartItemArray.push(item.productId)
       };
       // Post order with required contact and productId array
-      fetchPostOrder(contact, cartItemArray);
-      window.location.href="confirmation.html#limitedWidthBlock";
-      basket.clear();
+      await fetchPostOrder(contact, cartItemArray);
+      //basket.clear();
 
     } else {
         alert("Certains éléments du formulaire contact sont incorrectement remplis, veuillez réessayer svp");
@@ -339,7 +339,7 @@ async function renderCartPage() {
     pToHome.style.color = "blue";
     pToHome.style.fontSize = "large";
     pToHome.style.cursor = "pointer";
-    pToHome.innerHTML = "=> Retour Accueil <=";
+    pToHome.innerHTML = "- Retour Accueil -";
     pToHome.addEventListener ("click", function(e){window.location.href="index.html"});
 
     // if not empty, display products listed in basket as saved in local storage
@@ -384,7 +384,7 @@ async function renderCartPage() {
 
       // complete the order unless basket is empty
       if (basket.basket.length !== 0) {
-        orderManagement(basket);
+        await orderManagement(basket);
       }
     }
   }
