@@ -306,7 +306,7 @@ async function orderManagement(basket) {
       };
       // Post order with required contact and productId array
       await fetchPostOrder(contact, cartItemArray);
-      //basket.clear();
+      basket.clear();
 
     } else {
         alert("Certains éléments du formulaire contact sont incorrectement remplis, veuillez réessayer svp");
