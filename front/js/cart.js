@@ -86,31 +86,41 @@ class Basket{
   }
 }
 
-
+/**
+* fetch all products from API
+* @returns Object API response
+*/
 async function fetchAllProducts() {
-  /* fetch all products from API */
   try {
     const url = `http://localhost:3000/api/products`;
     const response = await fetch(url);
-    const data = await response.json();
-    return data;
+    return await response.json();
 
   } catch (err) {
-    alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
-    return null;
+    alert (`Erreur       : ${err}  \n- veuillez consulter le fichier README.md -`);
+    return {};
   }
 }
 
-function getProductPrice (productId,data){
-  // get product price in database: avoiding price storage = fraud risk
-  return data.find(x => x._id === productId).price
+/**
+* get product price in database: avoiding price storage = fraud risk
+* @param {*} productId
+* @param {*} data product details including price
+* @returns Number product price
+*/
+function getProductPrice (productId, data){
+  return data.find(x => x._id === productId).price;
 }
 
+/**
+* for each cart item of basket, get corresponding price from database
+* and compute quantity x price;
+* then sum all
+* @param {*} basket
+* @param {*} data product details
+* @returns integer basket total price
+*/
 function getTotalCartPrice (basket, data){
-  /* for each cart item of basket, get corresponding price from database
-  and compute quantity x price;
-  then sum all
-  */
   let total = 0;
   for (let product of basket) {
     total += product.quantity * getProductPrice (product.productId, data);
@@ -118,20 +128,25 @@ function getTotalCartPrice (basket, data){
   return total;
 }
 
-async function displayTotalInvoice (cartQuantity, cartPrice){
-  /* display cart total price and quantity at the right nodes on cart.HTML
-  */
+/**
+* display cart total price and quantity at the right nodes on cart.HTML
+* @param {*} cartQuantity number of item in cart
+* @param {*} cartPrice cart total price
+*/
+function displayTotalInvoice (cartQuantity, cartPrice){
   let totalQuantity = document.getElementById("totalQuantity");
   let totalPrice = document.getElementById("totalPrice");
-  totalQuantity.innerText =  cartQuantity;
-  totalPrice.innerText =  cartPrice;
+  totalQuantity.innerText = cartQuantity;
+  totalPrice.innerText = cartPrice;
 }
 
-async function displayCartItem (cartItem, product){
-  /* Display dynamically one cart item
-  sensitive product info, such as price, is directly obtained from product API
-  */
-
+/**
+* Display dynamically one cart item
+* sensitive product info, such as price, is directly obtained from product API
+* @param {*} cartItem
+* @param {*} product product details
+*/
+function displayCartItem (cartItem, product){
   // create DOM nodes
   const cartItems = document.getElementById("cart__items");
   const article = document.createElement("article");
@@ -195,12 +210,15 @@ async function displayCartItem (cartItem, product){
   h2.innerText = product.name;
 }
 
+/**
+* POST contact info and cart content to backe-end
+* "http://localhost:3000/api/products/order"
+* Get order ID as a reply from backend
+* @param {*} contact contact details as specified API format
+* @param {*} products list of products in the cart as specified API format
+* @returns null
+*/
 async function fetchPostOrder(contact, products) {
-  /* POST contact info and cart content to backe-end
-  "http://localhost:3000/api/products/order"
-  Get order ID as a reply from backend
-  */
-
   fetch("http://localhost:3000/api/products/order", {
   method: "POST",
   headers: {
@@ -212,7 +230,7 @@ async function fetchPostOrder(contact, products) {
 .then((response) => response.json())
 .then((data) => {
   // without using local storage
-      document.location.href = `confirmation.html?id=${data.orderId}#limitedWidthBlock`;
+  document.location.href = `confirmation.html?id=${data.orderId}#limitedWidthBlock`;
 })
 .catch((err) => {
   alert("Erreur : " + err);
@@ -220,15 +238,16 @@ async function fetchPostOrder(contact, products) {
 return null;
 }
 
+/**
+* verify that each required field is correctly inputed
+* return True is everything is ok + the object contact
+* @returns Object
+*/
 function inputContactOk () {
-  /* verify that each required field is correctly inputed
-  return True is everything is ok + the object contact
-  */
-
   // accepted format for contact info
-  const regexName = /^(?=.{1,50}$)[a-z\u00C0-\u00FF]+(?:['-_.\s][a-z\u00C0-\u00FF]+)*$/i;
-  const regexLocation = /^[a-zA-Z0-9\u00C0-\u00FF\s,. '-]{3,}$/;
-  const regexEmail = /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/;
+  const regexName = /^(?=.{1,50}$)[a-z0-9]+(?:['-_.\s][a-z]+)*$/i;
+  const regexLocation = /^[a-zA-Z0-9\s,. '-]{3,}$/;
+  const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   let inputFisrtNameOk = false;
   let inputLastNameOk = false;
   let inputAddressOk = false;
@@ -249,99 +268,109 @@ function inputContactOk () {
     inputFisrtNameOk = false;
     document.getElementById('firstNameErrorMsg').innerText =
     "Merci de vérifier le format de saisie du prénom";
-  } else {inputFisrtNameOk = true}
+  } else {
+    inputFisrtNameOk = true;
+  }
 
   if (!regexName.test(contact.lastName)) {
     inputLastNameOk = false;
     document.getElementById('lastNameErrorMsg').innerText =
     "Merci de vérifier le format de saisie du nom";
-  } else {inputLastNameOk = true}
+  } else {
+    inputLastNameOk = true;
+  }
 
   if (!regexLocation.test(contact.address)) {
     inputAddressOk = false;
     document.getElementById('addressErrorMsg').innerText =
     "Merci de vérifier le format de saisie de l'adresse";
-  } else {inputAddressOk = true}
+  } else {
+    inputAddressOk = true;
+  }
 
   if (!regexLocation.test(contact.city)) {
     inputCityOk = false;
     document.getElementById('cityErrorMsg').innerText =
     "Merci de vérifier le format de saisie de la ville";
-  } else {inputCityOk = true}
+  } else {
+    inputCityOk = true;
+  }
 
   if (!regexEmail.test(contact.email)) {
     inputEmailOk = false;
     document.getElementById('emailErrorMsg').innerText =
     "Merci de vérifier le format de saisie de l'email";
-  } else {inputEmailOk = true}
+  } else {
+    inputEmailOk = true;
+  }
 
-  let inputIsOk = (inputFisrtNameOk == true && inputLastNameOk == true &&
-    inputAddressOk == true &&  inputCityOk == true && inputEmailOk == true);
+  let inputIsOk = (inputFisrtNameOk && inputLastNameOk &&
+    inputAddressOk && inputCityOk && inputEmailOk);
 
-  return [inputIsOk, contact];
-}
+    return {inputIsOk: inputIsOk, contact: contact};
+  }
 
-
-async function orderManagement(basket) {
-  /* Wait for custy to input contact info
-  check input format
-  create contact and product_array as required by API, and POST to API
+  /**
+  * Wait for custy to input contact info
+  * check input format
+  * create contact and product_array as required by API, and POST to API
+  * @param {*} basket
   */
+  async function orderManagement(basket) {
+    const orderBtn = document.getElementById("order");
+    orderBtn.addEventListener("click", async (e) => {
+      const res = inputContactOk();
+      const contact = res.contact;
 
-  const orderBtn = document.getElementById("order");
-  orderBtn.addEventListener("click", async (e) => {
-    let res = inputContactOk();
-    let inputIsOk = res[0];
-    let contact = res[1];
+      // if all input are correct, generate order data and post to API
+      if (res.inputIsOk) {
+        e.preventDefault();
 
-    // if all input are correct, generate order data and post to API
-    if (inputIsOk) {
-      e.preventDefault();
+        // create API required product id list
+        let cartItemArray = [];
+        for (let item of basket.basket){
+          cartItemArray.push(item.productId)
+        };
+        // Post order with required contact and productId array
+        await fetchPostOrder(contact, cartItemArray);
+        basket.clear();
 
-      // create API required product id list
-      let cartItemArray = [];
-      for (let item of basket.basket){
-        cartItemArray.push(item.productId)
-      };
-      // Post order with required contact and productId array
-      await fetchPostOrder(contact, cartItemArray);
-      basket.clear();
-
-    } else {
+      } else {
         alert("Certains éléments du formulaire contact sont incorrectement remplis, veuillez réessayer svp");
-    }
-  });
-}
+      }
+    });
+  }
 
 
-
-async function renderCartPage() {
-  /* display cart content using product API info
-  - manage deletion and cartItem change of quantity
-  -uptdate total of articles & price
-  - if cart is not empty => function orderManagement
+  /**
+  * display cart content using product API info
+  * - manage deletion and cartItem change of quantity
+  * -uptdate total of articles & price
+  * - if cart is not empty => function orderManagement
   */
+  async function renderCartPage() {
+    const data = await fetchAllProducts();
+    let basket = new Basket();
 
-  const data = await fetchAllProducts();
-  let basket = new Basket();
+    // Check for empty basket
+    if (basket.basket.length === 0 ) {
+      const emptyCart = document.querySelector("h1");
+      emptyCart.innerHTML = emptyCart.innerText + " \nest vide";
+      // hide unecessary order contact infos
+      document.getElementsByClassName("cart__order")[0].setAttribute("style", "display:none");
 
-  // Check for empty basket
-  if (basket.basket.length === 0 ) {
-    const emptyCart = document.querySelector("h1");
-    emptyCart.innerHTML = emptyCart.innerText + " \nest vide";
-    // hide unecessary order contact infos
-    document.getElementsByClassName("cart__order")[0].setAttribute("style", "display:none");
+      // display clickable link to go back to index
+      const pToHome = document.createElement("p");
+      const aToHome = document.createElement("a");
+      emptyCart.appendChild(pToHome);
+      pToHome.appendChild(aToHome);
+      aToHome.style.color = "blue";
+      aToHome.style.fontSize = "large";
+      aToHome.style.cursor = "pointer";
+      aToHome.innerHTML = "- Retour Accueil -";
+      aToHome.href = "./index.html";
 
-    // display clickable link to go back to index
-    const pToHome = document.createElement("p");
-    emptyCart.appendChild(pToHome);
-    pToHome.style.color = "blue";
-    pToHome.style.fontSize = "large";
-    pToHome.style.cursor = "pointer";
-    pToHome.innerHTML = "- Retour Accueil -";
-    pToHome.addEventListener ("click", function(e){window.location.href="index.html"});
-
-    // if not empty, display products listed in basket as saved in local storage
+      // if not empty, display products listed in basket as saved in local storage
     } else {
       // display each product in the basket - getting full product info for a given item
       for (let cartItem of basket.basket) {
@@ -358,7 +387,9 @@ async function renderCartPage() {
           let cartItem = basket.getProductById(article.dataset.id); //corresponding item
           basket.remove(cartItem); // remove item from basket
           article.remove(); // remove item from DOM
-          if (basket.basket.length === 0 ) {document.location.reload(true)}
+          if (basket.basket.length === 0 ) {
+            document.location.reload(true);
+          }
           displayTotalInvoice(basket.getNumberOfProducts(),
           getTotalCartPrice (basket.basket, data));
         });
@@ -388,8 +419,5 @@ async function renderCartPage() {
     }
   }
 
-
-
   /********************* Execute *************************/
-
   renderCartPage();

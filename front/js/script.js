@@ -1,4 +1,4 @@
-/* API 
+/* API
 url: http://localhost:3000/api/products
 Data format
 {
@@ -14,10 +14,11 @@ Data format
 */
 
 
-/* const fetchAllProducts = async () => { */
+/**
+ * fetch all products from API - method is GET
+ * @returns Object|null list of all API products
+ */
 async function fetchAllProducts() {
-    /* fetch all products from API - verb is GET
-    */
     try {
         const url = `http://localhost:3000/api/products`;
         const response = await fetch(url);
@@ -25,25 +26,24 @@ async function fetchAllProducts() {
         return data;
 
     } catch (err) {
-        alert (`Erreur       : ${err}  \n- veuillez consulter le fichier READ.me -`);
+        alert (`Erreur       : ${err}  \n- veuillez consulter le fichier README.md -`);
         return null;
     }
 }
 
+/**
+* Display all products available as stipulated in index.html -> #items
+* @var Object product API data
+* @returns void
+*/
 function displayProducts(product) {
-    /* Display all products available as stipulated in index.html -> #items
-    input: data from the API
-    where : #items in index.html
-    output: display products
-    */
-
     // create in DOM the required format for displaying the product card
     const a = document.createElement("a");
     const article = document.createElement("article");
     const img = document.createElement("img");
     const h3 = document.createElement("h3");
     const p = document.createElement("p");
-    const urlProduct = `./product.html?id=`;
+    const urlProduct = './product.html?id=';
 
     // add class names to the newly created DOM elements
     article.classList.add("card__article");
@@ -54,9 +54,9 @@ function displayProducts(product) {
     // Append DOM strucutre with the newly created DOM elements
     document.getElementById("items").appendChild(a);
     a.appendChild(article);
-        article.appendChild(img);
-        article.appendChild(h3);
-        article.appendChild(p);
+    article.appendChild(img);
+    article.appendChild(h3);
+    article.appendChild(p);
 
     // assign product API info to the newly created DOM elements
     a.href = urlProduct + product._id;
@@ -66,11 +66,11 @@ function displayProducts(product) {
     p.textContent = product.description;
 }
 
-
+/**
+* Get data from API and display each product
+* @returns void
+*/
 async function renderPage() {
-    /* Get data from API and display each product
-    */
-
     const data = await fetchAllProducts();
     data.forEach(function (product) {
         displayProducts(product);
