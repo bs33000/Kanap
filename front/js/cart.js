@@ -166,19 +166,19 @@ function displayCartItem (cartItem, product){
 
   // dynamic HTML structure
   cartItems.appendChild(article);
-  article.appendChild(divImg);
-  divImg.appendChild(img);
+    article.appendChild(divImg);
+      divImg.appendChild(img);
   article.appendChild(divContent);
-  divContent.appendChild(divContentInfo);
-  divContentInfo.appendChild(h2);
-  divContentInfo.appendChild(pPrice);
-  divContentInfo.appendChild(pColor);
-  divContent.appendChild(divSettings);
-  divSettings.appendChild(divSettingsQty);
-  divSettingsQty.appendChild(pQty);
-  divSettingsQty.appendChild(inputQty);
-  divSettings.appendChild(divSettingsDelete);
-  divSettingsDelete.appendChild(pDel);
+    divContent.appendChild(divContentInfo);
+      divContentInfo.appendChild(h2);
+      divContentInfo.appendChild(pPrice);
+      divContentInfo.appendChild(pColor);
+    divContent.appendChild(divSettings);
+      divSettings.appendChild(divSettingsQty);
+        divSettingsQty.appendChild(pQty);
+        divSettingsQty.appendChild(inputQty);
+      divSettings.appendChild(divSettingsDelete);
+        divSettingsDelete.appendChild(pDel);
 
 
   //  Add classes dynamically
@@ -363,12 +363,12 @@ function inputContactOk () {
       const pToHome = document.createElement("p");
       const aToHome = document.createElement("a");
       emptyCart.appendChild(pToHome);
-      pToHome.appendChild(aToHome);
-      aToHome.style.color = "blue";
-      aToHome.style.fontSize = "large";
-      aToHome.style.cursor = "pointer";
-      aToHome.innerHTML = "- Retour Accueil -";
-      aToHome.href = "./index.html";
+        pToHome.appendChild(aToHome);
+          aToHome.style.color = "blue";
+          aToHome.style.fontSize = "large";
+          aToHome.style.cursor = "pointer";
+          aToHome.innerHTML = "- Retour Accueil -";
+          aToHome.href = "./index.html";
 
       // if not empty, display products listed in basket as saved in local storage
     } else {

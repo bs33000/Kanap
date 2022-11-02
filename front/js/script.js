@@ -53,10 +53,10 @@ function displayProducts(product) {
 
     // Append DOM strucutre with the newly created DOM elements
     document.getElementById("items").appendChild(a);
-    a.appendChild(article);
-    article.appendChild(img);
-    article.appendChild(h3);
-    article.appendChild(p);
+        a.appendChild(article);
+            article.appendChild(img);
+            article.appendChild(h3);
+            article.appendChild(p);
 
     // assign product API info to the newly created DOM elements
     a.href = urlProduct + product._id;

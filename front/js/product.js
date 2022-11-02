@@ -109,9 +109,10 @@ async function fetchProductById(urlId) {
  * @returns void
  */
 function displayProductDetail(product) {
+   // create DOM nodes
   const img = document.createElement("img");
-  img.src = product.imageUrl;
-  img.alt = product.altTxt;
+    img.src = product.imageUrl;
+    img.alt = product.altTxt;
 
   // populate product infos in DOM
   document.getElementsByClassName("item__img")[0].appendChild(img);
@@ -122,10 +123,10 @@ function displayProductDetail(product) {
   // Retrieve available color choices and propose them in the HTML option/select btn
   product.colors.forEach(function (color) {
     const option = document.createElement("option");
-    option.value = color;
-    option.innerText = color;
+      option.value = color;
+      option.innerText = color;
     const select = document.getElementById("colors");
-    select.appendChild(option);
+      select.appendChild(option);
   });
 }
 
