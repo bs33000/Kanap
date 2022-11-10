@@ -84,6 +84,11 @@ class Basket{
     }
     return total;
   }
+
+  sortById() {
+    this.basket.sort( (a, b) => a.id.localeCompare(b.id) );
+    this.save();
+  }
 }
 
 /**

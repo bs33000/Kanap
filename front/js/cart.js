@@ -84,6 +84,11 @@ class Basket{
     }
     return total;
   }
+
+  sortById() {
+    this.basket.sort( (a, b) => a.id.localeCompare(b.id) );
+    this.save();
+  }
 }
 
 /**
@@ -351,6 +356,7 @@ function inputContactOk () {
   async function renderCartPage() {
     const data = await fetchAllProducts();
     let basket = new Basket();
+    basket.sortById();
 
     // Check for empty basket
     if (basket.basket.length === 0 ) {
